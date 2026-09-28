@@ -1,3 +1,5 @@
+//In this file we will handle the sign up route for the user
+
 import dbConnect from "@/lib/dbConnect";
 import Usermodel from "@/model/User";
 import bcrypt from "bcrypt";
