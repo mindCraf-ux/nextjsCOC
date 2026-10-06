@@ -13,6 +13,8 @@ import dbConnect from "@/lib/dbConnect";
 import Usermodel from "@/model/User";
 import { User } from "next-auth";
 
+//here write the api for post request
+//which is used to update the status of user to accept messages
 export async function POST(request: Request) {
   await dbConnect()
 
@@ -70,4 +72,57 @@ export async function POST(request: Request) {
     )
   }
 
+}
+
+//here write the api for get request
+//which is used to get the status of user to accept messages
+export async function GET(request: Request) {
+  await dbConnect()
+
+  const session = await getServerSession(authOptions)
+  const user: User = session?.user as any //typecasting is used
+
+  if (!session || !session.user) {
+    return Response.json(
+      {
+        success: false,
+        message: "Not Authenticated"
+      },
+      { status: 401 }
+    )
+  }
+
+  const userId = user._id?.toString();
+  try {
+    const foundUser = await Usermodel.findById(userId)
+    //if we didn't found the user
+    if (!foundUser) {
+      return Response.json(
+        {
+          success: false,
+          message: "User not found"
+        },
+        { status: 401 }
+      )
+    }
+    //if we found the user
+    return Response.json(
+      {
+        success: true,
+        message: "User status fetched successfully",
+        foundUser
+      },
+      { status: 200 }
+    )
+  }
+  catch (error) {
+    console.log("failed to update user status to accept messages")
+    return Response.json(
+      {
+        success: false,
+        message: "Failed to update user status to accept messages"
+      },
+      { status: 500 }
+    )
+  }
 }
